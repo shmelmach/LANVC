@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\LANVC.Adapter\LANVC.Adapter.csproj" />
+    <ProjectReference Include="..\LANVC.Core\LANVC.Core.csproj" />
+    <ProjectReference Include="..\LANVC.Security\LANVC.Security.csproj" />
+    <ProjectReference Include="..\LANVC.Shared\LANVC.Shared.csproj" />
+    <ProjectReference Include="..\LANVC.Transport\LANVC.Transport.csproj" />
+  </ItemGroup>
+
+</Project>

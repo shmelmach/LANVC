@@ -1,0 +1,15 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/LANVC.Adapter/LANVC.Adapter.csproj" />
+    <Project Path="src/LANVC.Admin/LANVC.Admin.csproj" />
+    <Project Path="src/LANVC.Client/LANVC.Client.csproj" />
+    <Project Path="src/LANVC.Core/LANVC.Core.csproj" />
+    <Project Path="src/LANVC.Security/LANVC.Security.csproj" />
+    <Project Path="src/LANVC.Server/LANVC.Server.csproj" />
+    <Project Path="src/LANVC.Shared/LANVC.Shared.csproj" />
+    <Project Path="src/LANVC.Transport/LANVC.Transport.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/LANVC.Tests/LANVC.Tests.csproj" />
+  </Folder>
+</Solution>

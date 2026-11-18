@@ -1,0 +1,487 @@
+﻿<Window x:Class="LANVC.Client.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="clr-namespace:LANVC.Client.ViewModels"
+        xmlns:conv="clr-namespace:LANVC.Client.Converters"
+        Title="LANVC" Height="680" Width="1060"
+        WindowStartupLocation="CenterScreen"
+        WindowStyle="None" AllowsTransparency="True" Background="Transparent"
+        MinHeight="580" MinWidth="920">
+
+    <Window.DataContext>
+        <vm:MainViewModel />
+    </Window.DataContext>
+
+    <Window.Resources>
+        <conv:TabVisibilityConverter x:Key="TabVisConverter" />
+
+        <!-- Tab Navigation Button Style -->
+        <Style x:Key="NavTabButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="#8E9BB2" />
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="FontWeight" Value="Medium" />
+            <Setter Property="Padding" Value="12,10" />
+            <Setter Property="HorizontalContentAlignment" Value="Left" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border" Background="{TemplateBinding Background}" CornerRadius="8" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#172033" />
+                                <Setter Property="Foreground" Value="#FFFFFF" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Window Action Button Style -->
+        <Style x:Key="WindowActionButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="#8E9BB2" />
+            <Setter Property="Width" Value="36" />
+            <Setter Property="Height" Value="30" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border" Background="{TemplateBinding Background}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#1F2A40" />
+                                <Setter Property="Foreground" Value="#FFFFFF" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <!-- Outer window border with drop shadow and rounded corners -->
+    <Border Background="#0D111D" CornerRadius="12" BorderBrush="#1F283D" BorderThickness="1">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="38" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <!-- CUSTOM TITLE BAR -->
+            <Grid Grid.Row="0" MouseDown="TitleBar_MouseDown" Background="Transparent">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <!-- Left Title + Brand Logo -->
+                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center" Margin="16,0,0,0">
+                    <Canvas Width="20" Height="20" Margin="0,0,10,0">
+                        <Line X1="10" Y1="4" X2="4" Y2="16" Stroke="#2A75FF" StrokeThickness="2" />
+                        <Line X1="10" Y1="4" X2="16" Y2="16" Stroke="#2A75FF" StrokeThickness="2" />
+                        <Line X1="4" Y1="16" X2="16" Y2="16" Stroke="#2A75FF" StrokeThickness="2" />
+                        <Ellipse Width="7" Height="7" Fill="#60A5FA" Canvas.Left="6.5" Canvas.Top="0.5" />
+                        <Ellipse Width="7" Height="7" Fill="#3B82F6" Canvas.Left="0.5" Canvas.Top="12.5" />
+                        <Ellipse Width="7" Height="7" Fill="#2563EB" Canvas.Left="12.5" Canvas.Top="12.5" />
+                    </Canvas>
+                    <TextBlock Text="LANVC" Foreground="#FFFFFF" FontWeight="Bold" FontSize="14" VerticalAlignment="Center" />
+                </StackPanel>
+
+                <!-- Window Control Buttons -->
+                <StackPanel Grid.Column="2" Orientation="Horizontal" Margin="0,4,8,0">
+                    <Button Style="{StaticResource WindowActionButtonStyle}" Click="Minimize_Click" ToolTip="Свернуть">
+                        <TextBlock Text="─" FontSize="11" />
+                    </Button>
+                    <Button Style="{StaticResource WindowActionButtonStyle}" Click="Maximize_Click" ToolTip="Развернуть">
+                        <TextBlock Text="□" FontSize="14" />
+                    </Button>
+                    <Button Style="{StaticResource WindowActionButtonStyle}" Click="Close_Click" ToolTip="Закрыть">
+                        <TextBlock Text="✕" FontSize="12" />
+                    </Button>
+                </StackPanel>
+            </Grid>
+
+            <!-- MAIN BODY LAYOUT (3 COLUMNS) -->
+            <Grid Grid.Row="1" Margin="12,4,12,12">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="140" />
+                    <!-- Left Sidebar -->
+                    <ColumnDefinition Width="*" />
+                    <!-- Center Content -->
+                    <ColumnDefinition Width="380" />
+                    <!-- Right Participants Sidebar -->
+                </Grid.ColumnDefinitions>
+
+                <!-- ================= LEFT SIDEBAR ================= -->
+                <Grid Grid.Column="0" Margin="0,0,12,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <StackPanel Grid.Row="0" Margin="0,10,0,0">
+                        <Button Style="{StaticResource NavTabButtonStyle}" Command="{Binding NavigateCommand}" CommandParameter="Home" Margin="0,0,0,4">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="⌂" FontSize="16" Margin="0,0,10,0" Foreground="#2A75FF" />
+                                <TextBlock Text="Главная" />
+                            </StackPanel>
+                        </Button>
+
+                        <Button Style="{StaticResource NavTabButtonStyle}" Command="{Binding NavigateCommand}" CommandParameter="Profiles" Margin="0,0,0,4">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="🗂" FontSize="14" Margin="0,0,10,0" />
+                                <TextBlock Text="Профили" />
+                            </StackPanel>
+                        </Button>
+
+                        <Button Style="{StaticResource NavTabButtonStyle}" Command="{Binding NavigateCommand}" CommandParameter="Settings" Margin="0,0,0,4">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="⚙" FontSize="14" Margin="0,0,10,0" />
+                                <TextBlock Text="Настройки" />
+                            </StackPanel>
+                        </Button>
+
+                        <Button Style="{StaticResource NavTabButtonStyle}" Command="{Binding NavigateCommand}" CommandParameter="About" Margin="0,0,0,4">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="ⓘ" FontSize="14" Margin="0,0,10,0" />
+                                <TextBlock Text="О программе" />
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+
+                    <!-- Bottom Wave Sparkline & Version -->
+                    <StackPanel Grid.Row="1" Margin="4,0,4,8">
+                        <Canvas Width="100" Height="24" HorizontalAlignment="Left" Margin="0,0,0,6">
+                            <Path Stroke="#2A75FF" StrokeThickness="2" Data="M 0,16 Q 15,2 30,14 T 60,10 T 80,18 T 100,8" />
+                        </Canvas>
+                        <TextBlock Text="v1.0.0" Foreground="#64748B" FontSize="11" Margin="2,0,0,0" />
+                    </StackPanel>
+                </Grid>
+
+                <!-- ================= CENTER WORK AREA ================= -->
+                <Grid Grid.Column="1" Margin="0,0,12,0">
+
+                    <!-- TAB 1: HOME VIEW -->
+                    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
+                                  Visibility="{Binding CurrentTab, Converter={StaticResource TabVisConverter}, ConverterParameter=Home}">
+                        <StackPanel Margin="6,4,6,0">
+
+                            <!-- Brand Header -->
+                            <StackPanel Orientation="Horizontal" Margin="0,4,0,18">
+                                <Canvas Width="50" Height="50" Margin="4,0,16,0" VerticalAlignment="Center">
+                                    <Line X1="25" Y1="10" X2="10" Y2="38" Stroke="#2A75FF" StrokeThickness="3.5" />
+                                    <Line X1="25" Y1="10" X2="40" Y2="38" Stroke="#2A75FF" StrokeThickness="3.5" />
+                                    <Line X1="10" Y1="38" X2="40" Y2="38" Stroke="#2A75FF" StrokeThickness="3.5" />
+                                    <Ellipse Width="16" Height="16" Fill="#60A5FA" Canvas.Left="17" Canvas.Top="2" />
+                                    <Ellipse Width="16" Height="16" Fill="#3B82F6" Canvas.Left="2" Canvas.Top="30" />
+                                    <Ellipse Width="16" Height="16" Fill="#2563EB" Canvas.Left="32" Canvas.Top="30" />
+                                </Canvas>
+                                <StackPanel VerticalAlignment="Center">
+                                    <TextBlock Text="LANVC" Foreground="#FFFFFF" FontWeight="Bold" FontSize="26" />
+                                    <TextBlock Text="Виртуальная локальная сеть" Foreground="#8E9BB2" FontSize="13" Margin="0,2,0,0" />
+                                </StackPanel>
+                            </StackPanel>
+
+                            <!-- CONNECTION INPUT CARD -->
+                            <Border Background="#151B2B" CornerRadius="12" BorderBrush="#242E46" BorderThickness="1" Padding="18" Margin="0,0,0,14">
+                                <StackPanel>
+                                    <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                                        <TextBlock Text="🌐" FontSize="12" Margin="0,0,6,0" />
+                                        <TextBlock Text="IP-адрес сервера" Foreground="#8E9BB2" FontSize="12" FontWeight="Medium" />
+                                    </StackPanel>
+
+                                    <Grid Margin="0,0,0,14">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="10" />
+                                            <ColumnDefinition Width="70" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBox Grid.Column="0" Text="{Binding ServerAddress, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource DarkTextBoxStyle}" />
+                                        <TextBox Grid.Column="2" Text="{Binding ServerPort, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource DarkTextBoxStyle}" HorizontalContentAlignment="Center" />
+                                    </Grid>
+
+                                    <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                                        <TextBlock Text="🔒" FontSize="12" Margin="0,0,6,0" />
+                                        <TextBlock Text="Пароль" Foreground="#8E9BB2" FontSize="12" FontWeight="Medium" />
+                                    </StackPanel>
+
+                                    <Grid Margin="0,0,0,18">
+                                        <PasswordBox x:Name="ServerPasswordBox" PasswordChanged="PasswordBox_PasswordChanged" Style="{StaticResource DarkPasswordBoxStyle}" Visibility="Visible" />
+                                        <TextBox x:Name="ServerPlainTextBox" Text="{Binding Password, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource DarkTextBoxStyle}" Visibility="Collapsed" />
+                                        <Button HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,10,0" Background="Transparent" BorderThickness="0" Cursor="Hand" Click="TogglePassword_Click">
+                                            <TextBlock Text="👁" Foreground="#8E9BB2" FontSize="14" />
+                                        </Button>
+                                    </Grid>
+
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="12" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <Button Grid.Column="0" Content="▶  Подключиться" Command="{Binding ConnectCommand}" Style="{StaticResource PrimaryButtonStyle}" Height="42" />
+                                        <Button Grid.Column="2" Content="■  Отключиться" Command="{Binding DisconnectCommand}" Style="{StaticResource SecondaryButtonStyle}" Height="42" />
+                                    </Grid>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- STATUS CARD -->
+                            <Border Background="#151B2B" CornerRadius="12" BorderBrush="#242E46" BorderThickness="1" Padding="14,12" Margin="0,0,0,12">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                                        <Ellipse Width="10" Height="10" Fill="{StaticResource SuccessGreenBrush}" Margin="0,0,8,0" />
+                                        <TextBlock Text="{Binding ConnectionStateText}" Foreground="#FFFFFF" FontWeight="SemiBold" FontSize="14" VerticalAlignment="Center" Margin="0,0,12,0" />
+                                        <TextBlock Text="⏱" FontSize="12" Foreground="#8E9BB2" VerticalAlignment="Center" Margin="0,0,4,0" />
+                                        <TextBlock Text="{Binding UptimeStats}" Foreground="#8E9BB2" FontSize="13" VerticalAlignment="Center" />
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                                        <TextBlock Text="Ваш виртуальный IP: " Foreground="#8E9BB2" FontSize="13" VerticalAlignment="Center" />
+                                        <TextBlock Text="{Binding VirtualIp}" Foreground="#FFFFFF" FontWeight="Bold" FontSize="14" VerticalAlignment="Center" Margin="0,0,8,0" />
+                                        <Button Command="{Binding CopyIpCommand}" Background="Transparent" BorderThickness="0" Cursor="Hand" ToolTip="Скопировать IP">
+                                            <TextBlock Text="⧉" Foreground="#8E9BB2" FontSize="15" />
+                                        </Button>
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+
+                            <!-- TRANSPORT CARD -->
+                            <Border Background="#151B2B" CornerRadius="12" BorderBrush="#242E46" BorderThickness="1" Padding="14,12" Margin="0,0,0,12">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <StackPanel Grid.Column="0">
+                                        <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                                            <TextBlock Text="⚡" FontSize="12" Foreground="#2A75FF" Margin="0,0,6,0" />
+                                            <TextBlock Text="Транспорт" Foreground="#8E9BB2" FontSize="12" FontWeight="Medium" />
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="{Binding TransportName}" Foreground="#FFFFFF" FontWeight="SemiBold" FontSize="14" VerticalAlignment="Center" Margin="0,0,10,0" />
+                                            <Border Background="#1A3A32" CornerRadius="6" Padding="8,2">
+                                                <TextBlock Text="{Binding TransportBadge}" Foreground="{StaticResource SuccessGreenBrush}" FontSize="11" FontWeight="SemiBold" />
+                                            </Border>
+                                        </StackPanel>
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                        <Border Width="3" Height="8" Background="#10B981" CornerRadius="1" Margin="2,0" VerticalAlignment="Bottom" />
+                                        <Border Width="3" Height="12" Background="#10B981" CornerRadius="1" Margin="2,0" VerticalAlignment="Bottom" />
+                                        <Border Width="3" Height="16" Background="#10B981" CornerRadius="1" Margin="2,0" VerticalAlignment="Bottom" />
+                                        <Border Width="3" Height="20" Background="#10B981" CornerRadius="1" Margin="2,0" VerticalAlignment="Bottom" />
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+
+                            <!-- STATISTICS CARD -->
+                            <Border Background="#151B2B" CornerRadius="12" BorderBrush="#242E46" BorderThickness="1" Padding="16" Margin="0,0,0,10">
+                                <StackPanel>
+                                    <Grid Margin="0,0,0,12">
+                                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                            <TextBlock Text="📊" FontSize="12" Foreground="#2A75FF" Margin="0,0,6,0" />
+                                            <TextBlock Text="Статистика" Foreground="#8E9BB2" FontSize="12" FontWeight="Medium" />
+                                        </StackPanel>
+                                        <Button Content="Подробнее..." HorizontalAlignment="Right" Background="#202A3E" Foreground="#8E9BB2" FontSize="12" Padding="10,4" BorderThickness="0" Cursor="Hand" Command="{Binding OpenDiagnosticsCommand}">
+                                            <Button.Template>
+                                                <ControlTemplate TargetType="Button">
+                                                    <Border Background="{TemplateBinding Background}" CornerRadius="6" Padding="{TemplateBinding Padding}">
+                                                        <ContentPresenter />
+                                                    </Border>
+                                                </ControlTemplate>
+                                            </Button.Template>
+                                        </Button>
+                                    </Grid>
+
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+
+                                        <StackPanel Grid.Column="0">
+                                            <TextBlock Text="{Binding DownloadSpeed}" Foreground="#FFFFFF" FontWeight="SemiBold" FontSize="14" Margin="0,0,0,6" />
+                                            <TextBlock Text="{Binding UploadSpeed}" Foreground="#FFFFFF" FontWeight="SemiBold" FontSize="14" />
+                                        </StackPanel>
+
+                                        <StackPanel Grid.Column="1">
+                                            <TextBlock Text="{Binding PacketsStats}" Foreground="#8E9BB2" FontSize="13" Margin="0,0,0,6" />
+                                            <TextBlock Text="{Binding LatencyStats}" Foreground="#8E9BB2" FontSize="13" />
+                                        </StackPanel>
+                                    </Grid>
+                                </StackPanel>
+                            </Border>
+
+                            <TextBlock Text="{Binding StatusMessage}" Foreground="#60A5FA" FontSize="12" HorizontalAlignment="Center" Margin="0,2,0,0" />
+                        </StackPanel>
+                    </ScrollViewer>
+
+                    <!-- TAB 2: PROFILES VIEW -->
+                    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
+                                  Visibility="{Binding CurrentTab, Converter={StaticResource TabVisConverter}, ConverterParameter=Profiles}">
+                        <StackPanel Margin="6,10,6,0">
+                            <TextBlock Text="Сохранённые профили сетей" Foreground="#FFFFFF" FontWeight="Bold" FontSize="20" Margin="0,0,0,14" />
+
+                            <Button Content="+ Сохранить текущие параметры как профиль" Command="{Binding SaveProfileCommand}" Style="{StaticResource SecondaryButtonStyle}" Margin="0,0,0,14" />
+
+                            <ItemsControl ItemsSource="{Binding Profiles}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Background="#151B2B" CornerRadius="10" BorderBrush="#242E46" BorderThickness="1" Padding="14" Margin="0,0,0,10">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+                                                <StackPanel Grid.Column="0">
+                                                    <TextBlock Text="{Binding Name}" Foreground="#FFFFFF" FontWeight="Bold" FontSize="15" />
+                                                    <TextBlock Foreground="#8E9BB2" FontSize="13" Margin="0,4,0,0">
+                                                        <Run Text="{Binding ServerAddress}" />:<Run Text="{Binding Port}" />
+                                                        <Run Text=" | Имя: " /><Run Text="{Binding Username}" />
+                                                    </TextBlock>
+                                                </StackPanel>
+                                                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                                    <Button Content="Выбрать" Command="{Binding DataContext.ApplyProfileCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" Style="{StaticResource PrimaryButtonStyle}" Height="34" Padding="12,0" Margin="0,0,8,0" />
+                                                    <Button Content="✕" Command="{Binding DataContext.DeleteProfileCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" Style="{StaticResource SecondaryButtonStyle}" Height="34" Width="34" Padding="0" />
+                                                </StackPanel>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </ScrollViewer>
+
+                    <!-- TAB 3: SETTINGS VIEW -->
+                    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
+                                  Visibility="{Binding CurrentTab, Converter={StaticResource TabVisConverter}, ConverterParameter=Settings}">
+                        <StackPanel Margin="6,10,6,0">
+                            <TextBlock Text="Настройки LANVC" Foreground="#FFFFFF" FontWeight="Bold" FontSize="20" Margin="0,0,0,16" />
+
+                            <Border Background="#151B2B" CornerRadius="10" BorderBrush="#242E46" BorderThickness="1" Padding="16" Margin="0,0,0,12">
+                                <StackPanel>
+                                    <TextBlock Text="Сетевые параметры" Foreground="#FFFFFF" FontWeight="SemiBold" FontSize="15" Margin="0,0,0,12" />
+
+                                    <TextBlock Text="Предпочитаемый транспорт:" Foreground="#8E9BB2" FontSize="13" Margin="0,0,0,6" />
+                                    <TextBlock Text="Автоматический (QUIC UDP c резервным переключением на WebSocket)" Foreground="#FFFFFF" FontSize="13" Margin="0,0,0,12" />
+
+                                    <TextBlock Text="Виртуальный MTU адаптера:" Foreground="#8E9BB2" FontSize="13" Margin="0,0,0,4" />
+                                    <TextBox Text="1420" IsReadOnly="True" Style="{StaticResource DarkTextBoxStyle}" Width="100" HorizontalAlignment="Left" Margin="0,0,0,12" />
+
+                                    <CheckBox Content="Включить игровой мост обнаружения LAN (Minecraft LAN, Source)" IsChecked="True" Foreground="#FFFFFF" Margin="0,0,0,10" />
+                                    <CheckBox Content="Автоматически восстанавливать соединение при разрыве" IsChecked="True" Foreground="#FFFFFF" Margin="0,0,0,10" />
+                                    <CheckBox Content="Сворачивать в системный трей при закрытии" IsChecked="True" Foreground="#FFFFFF" />
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </ScrollViewer>
+
+                    <!-- TAB 4: ABOUT / DIAGNOSTICS VIEW -->
+                    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
+                                  Visibility="{Binding CurrentTab, Converter={StaticResource TabVisConverter}, ConverterParameter=About}">
+                        <StackPanel Margin="6,10,6,0">
+                            <TextBlock Text="О программе и Диагностика" Foreground="#FFFFFF" FontWeight="Bold" FontSize="20" Margin="0,0,0,12" />
+
+                            <Border Background="#151B2B" CornerRadius="10" BorderBrush="#242E46" BorderThickness="1" Padding="16" Margin="0,0,0,12">
+                                <StackPanel>
+                                    <TextBlock Text="LANVC Virtual LAN Controller v1.0.0" Foreground="#FFFFFF" FontWeight="SemiBold" FontSize="15" />
+                                    <TextBlock Text="Полноценная виртуальная локальная сеть для онлайн-игр по архитектуре Hub-and-Spoke с поддержкой QUIC, WebSocket, Wintun и TLS 1.3." Foreground="#8E9BB2" FontSize="13" TextWrapping="Wrap" Margin="0,6,0,12" />
+
+                                    <Button Content="Экспортировать диагностический отчёт" Command="{Binding ExportDiagnosticsCommand}" Style="{StaticResource PrimaryButtonStyle}" HorizontalAlignment="Left" Height="36" Margin="0,0,0,14" />
+
+                                    <TextBlock Text="Журнал событий реального времени:" Foreground="#8E9BB2" FontSize="13" Margin="0,0,0,6" />
+                                    <ListBox ItemsSource="{Binding DiagnosticsLogs}" Height="200" Background="#111624" Foreground="#A0AEC0" BorderBrush="#242E46" BorderThickness="1" FontFamily="Consolas" FontSize="11" />
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </ScrollViewer>
+
+                </Grid>
+
+                <!-- ================= RIGHT PARTICIPANTS SIDEBAR ================= -->
+                <Grid Grid.Column="2">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="8,8,0,12">
+                        <TextBlock Text="👥" FontSize="14" Foreground="#2A75FF" Margin="0,0,8,0" VerticalAlignment="Center" />
+                        <TextBlock Text="{Binding ParticipantsHeader}" Foreground="#FFFFFF" FontWeight="Bold" FontSize="15" VerticalAlignment="Center" />
+                    </StackPanel>
+
+                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                        <ItemsControl ItemsSource="{Binding Participants}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Background="#151B2B" CornerRadius="10" BorderBrush="#1F283D" BorderThickness="1" Padding="12,10" Margin="0,0,4,8">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+
+                                            <Ellipse Grid.Column="0" Width="8" Height="8" Fill="{StaticResource SuccessGreenBrush}" Margin="0,0,10,0" VerticalAlignment="Center" />
+
+                                            <Border Grid.Column="1" Width="36" Height="36" CornerRadius="18" Background="#242E46" Margin="0,0,12,0">
+                                                <TextBlock Text="{Binding AvatarInitial}" Foreground="#FFFFFF" FontWeight="Bold" FontSize="15" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                            </Border>
+
+                                            <StackPanel Grid.Column="2" VerticalAlignment="Center">
+                                                <TextBlock Text="{Binding Hostname}" Foreground="#FFFFFF" FontWeight="SemiBold" FontSize="13" />
+                                                <TextBlock Text="{Binding DisplayIp}" Foreground="#8E9BB2" FontSize="12" Margin="0,2,0,0" />
+                                            </StackPanel>
+
+                                            <StackPanel Grid.Column="3" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Right">
+                                                <TextBlock Text="{Binding OnlineDuration}" Foreground="#8E9BB2" FontSize="12" VerticalAlignment="Center" Margin="0,0,10,0" />
+                                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                    <Border Width="2.5" Height="6" Background="#10B981" Margin="1,0" VerticalAlignment="Bottom" />
+                                                    <Border Width="2.5" Height="9" Background="#10B981" Margin="1,0" VerticalAlignment="Bottom" />
+                                                    <Border Width="2.5" Height="12" Background="#10B981" Margin="1,0" VerticalAlignment="Bottom" />
+                                                    <Border Width="2.5" Height="15" Background="#10B981" Margin="1,0" VerticalAlignment="Bottom" />
+                                                </StackPanel>
+                                            </StackPanel>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+
+                    <!-- Bottom Security Badge -->
+                    <Border Grid.Row="2" Background="#151B2B" CornerRadius="10" BorderBrush="#1F283D" BorderThickness="1" Padding="14,12" Margin="0,8,0,0">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <Border Width="30" Height="30" CornerRadius="15" Background="#113626" Margin="0,0,12,0" VerticalAlignment="Center">
+                                <TextBlock Text="🛡" FontSize="14" Foreground="#10B981" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            </Border>
+                            <StackPanel VerticalAlignment="Center">
+                                <TextBlock Text="Соединение защищено" Foreground="#FFFFFF" FontWeight="SemiBold" FontSize="13" />
+                                <TextBlock Text="TLS 1.3 · Надёжное шифрование" Foreground="#8E9BB2" FontSize="11" Margin="0,2,0,0" />
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </Grid>
+        </Grid>
+    </Border>
+</Window>

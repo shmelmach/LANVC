@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\LANVC.Shared\LANVC.Shared.csproj" />
+    <ProjectReference Include="..\LANVC.Core\LANVC.Core.csproj" />
+    <ProjectReference Include="..\LANVC.Security\LANVC.Security.csproj" />
+    <ProjectReference Include="..\LANVC.Transport\LANVC.Transport.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="11.0.0" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+</Project>
